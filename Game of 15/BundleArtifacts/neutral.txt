@@ -1,0 +1,2 @@
+MainPackage=C:\Users\Vadim Melnyk\Documents\Visual Studio 2013\Projects\Game of 15\Game of 15\bin\Debug\Game of 15_1.1.0.1_Bundle\Game of 15_1.1.0.1_AnyCPU_Debug.appx
+ResourcePack=C:\Users\Vadim Melnyk\Documents\Visual Studio 2013\Projects\Game of 15\Game of 15\bin\Debug\Game of 15_1.1.0.1_Bundle\Game of 15_1.1.0.1_scale-180.appx

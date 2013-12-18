@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Game_of_15</title>
+
+        <!-- WinJS references -->
+        <link href="//Microsoft.WinJS.2.0/css/ui-light.css" rel="stylesheet" />
+        <script src="//Microsoft.WinJS.2.0/js/base.js"></script>
+        <script src="//Microsoft.WinJS.2.0/js/ui.js"></script>
+
+        <!--<!-- Game_of_15 references -->
+        <link href="/css/default.css" rel="stylesheet" />
+        <script src="/js/default.js"></script>
+        <script src="Scripts/jquery-2.0.3.min.js"></script>
+        <!--jQPuzzle references-->
+
+        <script src="jqpuzzle/jquery.jqpuzzle.full.js"></script>
+        <link href="jqpuzzle/jquery.jqpuzzle.css" rel="stylesheet" />
+
+    </head>
+    <body>
+        
+        <div class="centered" align="center">
+            <img id="image" style="display:none;">
+        </div>
+    
+
+    </body>
+</html>
+<script>
+    level = window.localStorage.getItem('level');
+    $(document).ready(function () {
+        
+       
+        var captureUI = new Windows.Media.Capture.CameraCaptureUI();
+        captureUI.captureFileAsync(Windows.Media.Capture.CameraCaptureUIMode.photo).then(function (file) {
+            if (file) {
+                //   document.getElementById("message").innerHTML = "User captured a photo.";
+                //  $("#photo").src(URL.createObjectURL(file));
+
+                if (level == 3)
+                    level_text = "EASY";
+                else if (level==4)
+                    level_text = "MEDIUM";
+                else if (level == 5)
+                    level_text = "HARD";
+                else if (level == 9)
+                    level_text = "GOD LEVEL";
+                
+
+
+
+                if (level < 9)
+                    rows_amount = 3;
+                else
+                    rows_amount = 9;
+                var settings = {
+                    rows: rows_amount,                    // number of rows [3 ... 9]
+                    cols: level,                    // number of columns [3 ... 9]
+                    hole: rows_amount*level-2,                   // initial hole position [1 ... rows*columns]
+                    shuffle: true,             // initially show shuffled pieces [true|false]
+                    numbers: true,              // initially show numbers on pieces [true|false]
+                    language: 'en',             // language for gui elements [language code]
+
+                    // display additional gui controls
+                    control: {
+                        shufflePieces: true,    // display 'Shuffle' button [true|false]
+                        confirmShuffle: false,   // ask before shuffling [true|false]
+                        toggleOriginal: false,   // display 'Original' button [true|false]
+                        toggleNumbers: true,    // display 'Numbers' button [true|false]
+                        counter: true,          // display moves counter [true|false]
+                        timer: true,            // display timer (seconds) [true|false]
+                        pauseTimer: true        // pause timer if 'Original' button is activated
+                        // [true|false]
+                    },
+
+                    // perform actions when the puzzle is solved sucessfully
+                    success: {
+                        fadeOriginal: false,    // cross-fade original image [true|false]
+                        callback: successFunction,    // callback a user-defined function [function]
+                        // the function is passed an object as its argument
+                        // which includes the fields 'moves' and 'seconds'
+                        callbackTimeout: 300    // time in ms after which the callback is called
+                    },
+
+                    // animation speeds and settings
+                    animation: {
+                        shuffleRounds: 3,       // number of shuffle rounds [1 ... ]
+                        shuffleSpeed: 800,      // time in ms to perform a shuffle round
+                        slidingSpeed: 200,      // time in ms for a single move
+                        fadeOriginalSpeed: 600  // time in ms to cross-fade original image
+                    },
+
+                    // additional style information not specified via css
+                    style: {
+                        gridSize: 2,            // space between two pieces in px
+                        overlap: true,          // if true, adjacent piece borders will overlap
+                        // applies only if gridSize is set to 0
+                        backgroundOpacity: 0.1  // opacity of the original image behind the pieces
+                        // [0 ... 1] (0 means no display)
+                    }
+                }
+
+                var texts = {
+                    shuffleLabel: 'Shuffle',
+                    toggleOriginalLabel: '',
+                    toggleNumbersLabel: 'Numbers',
+                    confirmShuffleMessage: 'Do you really want to shuffle?',
+                    movesLabel: 'moves',
+                    secondsLabel: 'seconds'
+                }
+
+
+                mapUrl = URL.createObjectURL(file);
+                $("#image").attr('src', mapUrl);
+                $('#image').jqPuzzle(settings, texts);
+                
+
+
+            } else {
+                location.href('/default.html');
+            }
+        });
+    });
+    
+    function successFunction() {
+        var folder = Windows.Storage.ApplicationData.current.roamingFolder;
+        folder.getFileAsync('results.txt').then(function (file) {
+            //process with a valid file
+            // Windows.Storage.FileIO.writeTextAsync(file, clicks.toString().concat(" clicks in ").concat(time.toString()).concat(" seconds<br>"));
+            Windows.Storage.FileIO.appendTextAsync(file, clicks.toString().concat(" clicks in ").concat(time.toString()).concat(" seconds (").concat((final_score).toString()).concat(" points; level ").concat(level_text).concat(')<br>\n'));
+            Windows.UI.Popups.MessageDialog("You have won! Congratulations!").showAsync();
+            location.href("/default.html");
+        }, function (e) {
+            //no file was found
+            Windows.UI.Popups.MessageDialog("You have won! Congratulations!").showAsync();
+            Windows.Storage.ApplicationData.current.roamingFolder.createFileAsync('results.txt').then(function (file) {
+                Windows.Storage.FileIO.appendTextAsync(file, clicks.toString().concat(" clicks in ").concat(time.toString()).concat(" seconds (").concat((final_score).toString()).concat(" points; level ").concat(level_text).concat(')<br>\n'));
+                location.href("/default.html");
+            });
+
+        });
+
+
+
+        // Windows.UI.Popups.MessageDialog(clicks.toString().concat(time.toString())).showAsync();
+       
+    }
+
+</script>
+
+
